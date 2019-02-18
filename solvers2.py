@@ -3,28 +3,20 @@ from queue import PriorityQueue
 import itertools
 
 
-def goal_test(state):
+def goalTest(state):
     return state.current.value == sorted(state.current.value)
 
 
 def bfs(start):
+    SearchPosition = namedtuple('SearchPos', 'node, depth, prev')
+    position = SearchPosition(start, 0, None)
 
-    # SearchPos used for bookeeping and finding the path:
-    SearchPos = namedtuple('SearchPos', 'node, depth, prev')
-
-    # Initial position does not have a predecessor
-    position = SearchPos(start, 0, None)
-
-
-    # frontier contains unexpanded positions
     frontier = [position]
     explored = set()
+
     while len(frontier) > 0:
-
-        # current position is the first position in the frontier
         position = frontier.pop(0)
-
-        node = position.node
+        currentNode = position.node
 
         try:
             if max([pos.depth for pos in frontier]) == 11:
@@ -32,23 +24,19 @@ def bfs(start):
         except ValueError:
             pass
 
-        # goal test: return success if True
-        if goal_test(node):
-            Success = namedtuple('Success', 'position, nodes_expanded')
+        if goalTest(currentNode):
+            Success = namedtuple('Success', 'position, nodesExpanded')
             success = Success(position, len(explored))
             return success
 
-        # expanded nodes are added to explored set
-        explored.add(node)
+        explored.add(currentNode)
 
-        # All reachable positions from current postion is added to frontier
-        for neighbor in node.successors():
-            new_position = SearchPos(neighbor, position.depth + 1, position)
-            frontier_check = neighbor in [pos.node for pos in frontier]
-            if neighbor not in explored and not frontier_check:
-                frontier.append(new_position)
+        for neighbor in currentNode.successors():
+            newPosition = SearchPosition(neighbor, position.depth + 1, position)
+            frontierCheck = neighbor in [pos.node for pos in frontier]
+            if neighbor not in explored and not frontierCheck:
+                frontier.append(newPosition)
 
-    # the goal could not be reached.
     return None
 
 def ids(start):
@@ -63,7 +51,7 @@ def dfs(route, depth):
     if depth == 0:
         return None
 
-    if goal_test(route[-1]):
+    if goalTest(route[-1]):
         return route
 
     for move in route[-1].successors():
@@ -74,63 +62,57 @@ def dfs(route, depth):
 
 def astar1(start):
     counter = itertools.count()
-    # SearchPos used for bookeeping and finding the path:
-    SearchPos = namedtuple('SearchPos', 'node, depth, prev')
+    SearchPosition = namedtuple('SearchPos', 'node, depth, prev')
+    position = SearchPosition(start, 0, None)
 
-    # Initial position does not have a predecessor
-    position = SearchPos(start, 0, None)
-
-    actual = position.node
-    leaves = PriorityQueue()
-    leaves.put((manhattan(actual), next(counter), position))
+    currentNode = position.node
+    frontier = PriorityQueue()
+    frontier.put((manhattan(currentNode), next(counter), position))
     explored = list()
+
     while True:
-        if leaves.empty():
+        if frontier.empty():
             return None
-        position = leaves.get()[2]
-        actual = position.node
-        if goal_test(actual):
-            Success = namedtuple('Success', 'position, nodes_expanded')
+        position = frontier.get()[2]
+        currentNode = position.node
+        if goalTest(currentNode):
+            Success = namedtuple('Success', 'position, nodesExpanded')
             success = Success(position, len(explored))
             return success
-        elif actual not in explored:
-            explored.append(actual)
-            successors = actual.successors()
+        elif currentNode not in explored:
+            explored.append(currentNode)
+            successors = currentNode.successors()
             for child in successors:
-                new_position = SearchPos(child, position.depth + 1, position)
-                #depth = max([pos.depth for pos in leaves])
-                if(new_position.depth <= 10):
-                    leaves.put((manhattan(child)+new_position.depth, next(counter), new_position)) #Figure out how to calculate depth
+                newPosition = SearchPosition(child, position.depth + 1, position)
+                if(newPosition.depth <= 10):
+                    frontier.put((manhattan(child)+newPosition.depth, next(counter), newPosition))
 
 def astar2(start):
     counter = itertools.count()
-    # SearchPos used for bookeeping and finding the path:
-    SearchPos = namedtuple('SearchPos', 'node, depth, prev')
+    SearchPosition = namedtuple('SearchPos', 'node, depth, prev')
+    position = SearchPosition(start, 0, None)
 
-    # Initial position does not have a predecessor
-    position = SearchPos(start, 0, None)
-
-    actual = position.node
-    leaves = PriorityQueue()
-    leaves.put((difference(actual), next(counter), position))
+    currentNode = position.node
+    frontier = PriorityQueue()
+    frontier.put((difference(currentNode), next(counter), position))
     explored = list()
     while True:
-        if leaves.empty():
+        if frontier.empty():
             return None
-        position = leaves.get()[2]
-        actual = position.node
-        if goal_test(actual):
-            Success = namedtuple('Success', 'position, nodes_expanded')
+        position = frontier.get()[2]
+        currentNode = position.node
+        if goalTest(currentNode):
+            Success = namedtuple('Success', 'position, nodesExpanded')
             success = Success(position, len(explored))
             return success
-        elif actual not in explored:
-            explored.append(actual)
-            successors = actual.successors()
+        elif currentNode not in explored:
+            explored.append(currentNode)
+            successors = currentNode.successors()
             for child in successors:
-                new_position = SearchPos(child, position.depth + 1, position)
-                #depth = max([pos.depth for pos in leaves])
-                if(new_position.depth <= 10):
-                    leaves.put((difference(child)+new_position.depth, next(counter), new_position)) #Figure out how to calculate depth
+                newPosition = SearchPosition(child, position.depth + 1, position)
+                if(newPosition.depth <= 10):
+                    frontier.put((difference(child)+newPosition.depth, next(counter), newPosition))
+
 
 def manhattan(state):
     value = state.current.value
@@ -144,17 +126,18 @@ def manhattan(state):
             h += abs(x-i) + abs(y-j)
     return h
 
+
 def difference(state):
-        value = state.current.value
-        cube = [[value[0], value[1], value[2]],
-            [value[3], value[4], value[5]],
-            [value[6], value[7], value[8]]]
-        goal = [[1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9]]
-        h = 0
-        for i in range(3):
-            for j in range(3):
-                if cube[i][j] != goal[i][j]:
-                    h += 1
-        return h
+    value = state.current.value
+    cube = [[value[0], value[1], value[2]],
+        [value[3], value[4], value[5]],
+        [value[6], value[7], value[8]]]
+    goal = [[1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9]]
+    h = 0
+    for i in range(3):
+        for j in range(3):
+            if cube[i][j] != goal[i][j]:
+                h += 1
+    return h
