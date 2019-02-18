@@ -1,19 +1,40 @@
-# from board import Board
-# import solvers
-#
-#
+from state2 import State
+import solvers2
+from sys import argv
+
 # def main():
-#     board = ['*', 1 , 3 , 4, 2, 5, 7, 8, 6]
-#     board = Board(board)
-#     print(solvers.bfs(board))
+#     start = [9, 1, 3, 4, 2, 5, 7, 8, 6]
+#     game = State(start)
+#     result = None
+#     depth = 0
+#
+#     if argv[1] == 'bfs':
+#         result = solvers2.bfs(game)
+#     elif argv[1] == 'ids':
+#         result, depth = solvers2.ids(game)
+#     elif argv[1] == 'astar1':
+#         result = solvers2.astar1(game)
+#     elif argv[1] == 'astar2':
+#         result = solvers2.astar2(game)
+#
+#     if not result:
+#         print("No result found in time")
+#     elif argv[1] == 'ids':
+#         print("Move sequence")
+#         trace_pathD(result)
+#         print("Search depth:")
+#         print(depth)
+#     else:
+#         finalPosition = result.position
+#         nodesExpanded = result.nodes_expanded
+#
+#         print("Move sequence:", trace_path(finalPosition))
+#         print("Nodes expanded:", nodesExpanded)
+#         print("Number of steps:", finalPosition.depth)
 #
 #
 # if __name__ == '__main__':
 #     main()
-from state2 import State
-import solvers2
-import time
-# import resource
 
 
 def trace_path(last_pos):
@@ -41,9 +62,7 @@ def trace_pathD(route):
     for state in route:
         print(state.current.value)
 
-
-start_time = time.time()
-config = [9, 1, 3, 4, 2, 5, 7, 8, 6]
+config = [8, 1, 3, 4, 9, 2, 7, 6, 5]
 
 game = State(config)
 
@@ -52,29 +71,42 @@ if result == None:
     print("No value found in time")
 else:
     final_pos = result.position
-    max_depth = result.max_depth
     nodes_expanded = result.nodes_expanded
 
     print("path_to_goal:", trace_path(final_pos))
-    print("cost_of_path:", final_pos.cost)
     print("nodes_expanded:", nodes_expanded)
     print("search_depth:", final_pos.depth)
-    print("max_search_depth:", max_depth)
-    print("running_time:", time.time() - start_time)
+    print("")
 
-result, depth = solvers2.ids(game)
-trace_pathD(result)
-print(depth)
+# result, depth = solvers2.ids(game)
+# trace_pathD(result)
+# print(depth)
 
 result = solvers2.astar1(game)
-final_pos = result.position
-print(trace_path(final_pos))
+if result == None:
+    print("No value found in time")
+else:
+    final_pos = result.position
+    nodes_expanded = result.nodes_expanded
+
+    print("path_to_goal:", trace_path(final_pos))
+    print("nodes_expanded:", nodes_expanded)
+    print("search_depth:", final_pos.depth)
+    print("")
+
 
 result = solvers2.astar2(game)
-final_pos = result.position
-print(trace_path(final_pos))
+if result == None:
+    print("No value found in time")
+else:
+    final_pos = result.position
+    nodes_expanded = result.nodes_expanded
 
-start_time = time.time()
+    print("path_to_goal:", trace_path(final_pos))
+    print("nodes_expanded:", nodes_expanded)
+    print("search_depth:", final_pos.depth)
+    print("")
+
 config = [1, 4, 3, 5, 2, 9, 7, 8, 6]
 
 game = State(config)
@@ -84,12 +116,33 @@ if result == None:
     print("No value found in time")
 else:
     final_pos = result.position
-    max_depth = result.max_depth
     nodes_expanded = result.nodes_expanded
 
     print("path_to_goal:", trace_path(final_pos))
-    print("cost_of_path:", final_pos.cost)
     print("nodes_expanded:", nodes_expanded)
     print("search_depth:", final_pos.depth)
-    print("max_search_depth:", max_depth)
-    print("running_time:", time.time() - start_time)
+    print("")
+
+result = solvers2.astar1(game)
+if result == None:
+    print("No value found in time")
+else:
+    final_pos = result.position
+    nodes_expanded = result.nodes_expanded
+
+    print("path_to_goal:", trace_path(final_pos))
+    print("nodes_expanded:", nodes_expanded)
+    print("search_depth:", final_pos.depth)
+    print("")
+
+result = solvers2.astar2(game)
+if result == None:
+    print("No value found in time")
+else:
+    final_pos = result.position
+    nodes_expanded = result.nodes_expanded
+
+    print("path_to_goal:", trace_path(final_pos))
+    print("nodes_expanded:", nodes_expanded)
+    print("search_depth:", final_pos.depth)
+    print("")
